@@ -19,8 +19,13 @@ export const getById = async (id: string) => {
 
 export const getAll = async () => {
   try {
-    const result = await executeQuery(`SELECT * FROM cafes`, []);
-    return result as Cafe.Full[];
+    const result = await executeQuery(`
+      SELECT c.id, c.name, c.description, c.logo, c.location, count(cafes_employees.employee_id) as employee_count 
+      FROM cafes c
+      LEFT JOIN cafes_employees ON c.id = cafes_employees.cafe_id 
+      GROUP BY c.id
+`, []);
+    return result as (Cafe.Full & { employee_count: number })[];
   } catch (err) {
     console.log(err)
     throw new Error('Error getting cafes')
@@ -28,8 +33,14 @@ export const getAll = async () => {
 }
 export const getByLocation = async (location: string) => {
   try {
-    const result = await executeQuery(`SELECT * FROM cafes WHERE location = ?`, [location]);
-    return result as Cafe.Full[];
+    const result = await executeQuery(`
+      SELECT c.id, c.name, c.description, c.logo, c.location, count(cafes_employees.employee_id) as employee_count 
+      FROM cafes c
+      WHERE c.location = ?
+      LEFT JOIN cafes_employees ON c.id = cafes_employees.cafe_id 
+      GROUP BY c.id
+`, [location]);
+    return result as (Cafe.Full & { employee_count: number })[]
   } catch (err) {
     console.log(err)
     throw new Error('Error getting cafes')

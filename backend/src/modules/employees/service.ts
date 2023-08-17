@@ -10,10 +10,14 @@ const generateId = () => {
 
 export const getById = async (id: string) => {
   try {
-    const query = `SELECT * FROM employees WHERE id = ?`;
+    const query = `
+      SELECT e.*, c.name as cafe_name, c.id as cafe_id 
+      FROM employees 
+      LEFT JOIN cafes_employees ce ON e.id = ce.employee_id LEFT JOIN cafes c ON ce.cafe_id = c.id
+      WHERE id = ?`;
     const values = [id];
     const result = await executeQuery(query, values);
-    return result as Employee.Full;
+    return (result as (Employee.Full & { cafe_name: string, cafe_id: string })[])?.[0]
   } catch (err) {
     console.log(err);
     throw new Error('Error getting employee');
@@ -22,9 +26,13 @@ export const getById = async (id: string) => {
 
 export const getAll = async () => {
   try {
-    const query = `SELECT * FROM employees`;
+    const query = `
+      SELECT e.* , c.name as cafe_name, c.id as cafe_id 
+      FROM employees e 
+      LEFT JOIN cafes_employees ce ON e.id = ce.employee_id 
+      LEFT JOIN cafes c ON ce.cafe_id = c.id`;
     const result = await executeQuery(query, []);
-    return result as Employee.Full[];
+    return result as (Employee.Full & { cafe_name: string, cafe_id: string })[];
   } catch (err) {
     console.log(err);
     throw new Error('Error getting employees');
@@ -55,7 +63,8 @@ export const create: (employeeData: Omit<Employee.Full, 'id'>) => Promise<Employ
     const values = [id, employeeData.name, employeeData.email_address, employeeData.phone_number, employeeData.gender];
     try {
       await executeQuery(query, values);
-      return getById(id);
+      const employee = await getById(id);
+      return employee as Employee.Full;
     } catch (error) {
       console.log(error);
       throw new Error('Error creating employee');
