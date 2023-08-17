@@ -1,0 +1,12 @@
+FROM node:18-alpine as dev
+
+COPY . /app
+
+WORKDIR /app
+RUN chown -R node:node /app
+USER node
+
+RUN npm i
+
+
+CMD ["npm", "run", "dev:docker"]

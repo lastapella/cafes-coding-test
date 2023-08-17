@@ -1,0 +1,32 @@
+services:
+  front-end:
+    build:
+      context: ../frontend
+    ports:
+      - 5160:5160
+    environment:
+      - VITE_PORT=5160
+      - VITE_API_ENDPOINT=http://localhost:3000
+
+  back-end:
+    build:
+      context: ../backend
+    ports:
+      - 3000:3000
+    environment:
+      - PORT=3000
+      - DBHOST=database
+
+  database:
+    image: mysql
+    restart: always
+    ports:
+      - 3306:3306
+    volumes: 
+      - ./volumes/initdb.d:/docker-entrypoint-initdb.d
+      - ./volumes/db/data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: cafes-db
+      MYSQL_USER: cafes-admin
+      MYSQL_PASSWORD: cafes-admin
