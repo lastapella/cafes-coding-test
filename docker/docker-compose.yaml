@@ -11,11 +11,17 @@ services:
   back-end:
     build:
       context: ../backend
+    depends_on:
+      database:
+        condition: service_healthy
     ports:
       - 3000:3000
     environment:
       - PORT=3000
-      - DBHOST=database
+      - DB_HOST=database
+      - DB_USER=cafes-admin
+      - DB_PASS=cafes-admin
+      - DB_NAME=cafes-db
 
   database:
     image: mysql
@@ -25,8 +31,13 @@ services:
     volumes: 
       - ./volumes/initdb.d:/docker-entrypoint-initdb.d
       - ./volumes/db/data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: cafes-db
       MYSQL_USER: cafes-admin
       MYSQL_PASSWORD: cafes-admin
+
