@@ -34,8 +34,8 @@ export const getByCafe = async (cafeId: string) => {
   try {
     const query = `
       SELECT * FROM employees 
-      INNER JOIN cafe_employees ON employees.id = cafe_employees.employee_id 
-      WHERE cafe_employees.cafe_id = ?`;
+      INNER JOIN cafes_employees ON employees.id = cafes_employees.employee_id 
+      WHERE cafes_employees.cafe_id = ?`;
     const values = [cafeId];
     const result = await executeQuery(query, values);
     return result as Employee.Full[];

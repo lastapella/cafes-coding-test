@@ -61,8 +61,8 @@ export const deleteById = async (id: string) => {
   try {
     await executeQuery(`
       DELETE FROM employees
-      INNER JOIN cafe_employees ON employees.id = cafe_employees.employee_id 
-      WHERE cafe_employees.cafe_id = ?`, [id]);
+      INNER JOIN cafes_employees ON employees.id = cafes_employees.employee_id 
+      WHERE cafes_employees.cafe_id = ?`, [id]);
     await executeQuery(`DELETE FROM cafes WHERE id = ?`, [id]);
   } catch (err) {
     console.log(err)
