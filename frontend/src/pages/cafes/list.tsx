@@ -1,7 +1,7 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { AgGridReact } from 'ag-grid-react';
 import { useNavigate, Link } from 'react-router-dom'
-import { Button, Container, Grid, Typography } from '@mui/material';
+import { Button,  Grid, Typography } from '@mui/material';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
@@ -43,10 +43,6 @@ const CafesList = ({ location }: { location?: string }) => {
     }
   }
 
-  useEffect(() => {
-    fetchCafes(location)
-  }, [location])
-
   const [columnDefs] = useState([
     { field: 'logo', cellRenderer: LogoColRenderer },
     { field: 'name' },
@@ -59,6 +55,10 @@ const CafesList = ({ location }: { location?: string }) => {
     },
     { field: 'actions', cellRenderer: ActionColRenderer }
   ]);
+  
+  const onGridReady = useCallback((params) => {
+    fetchCafes(location)
+  }, []);
 
   return <Grid container spacing={2}>
     <Grid container item xs={12}>
@@ -75,6 +75,7 @@ const CafesList = ({ location }: { location?: string }) => {
           rowData={cafes}
           columnDefs={columnDefs}
           domLayout='autoHeight'
+          onGridReady={onGridReady}
         >
         </AgGridReact>
       </div>

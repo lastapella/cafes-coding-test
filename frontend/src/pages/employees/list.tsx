@@ -1,5 +1,5 @@
 
-import { useEffect, useState, useMemo } from 'react'
+import { useState, useCallback } from 'react'
 import { AgGridReact } from 'ag-grid-react';
 import { useNavigate, useSearchParams, Link, useLocation } from 'react-router-dom'
 import { Button, Container, Grid, Typography } from '@mui/material';
@@ -38,9 +38,6 @@ const EmployeesList = () => {
     }
   }
 
-  useEffect(() => {
-    fetchEmployees(cafe)
-  }, [cafe])
 
   const [columnDefs] = useState([
     { field: 'name' },
@@ -57,6 +54,11 @@ const EmployeesList = () => {
     { field: 'actions', cellRenderer: ActionColRenderer }
   ]);
 
+  const onGridReady = useCallback((params) => {
+    fetchEmployees(cafe)
+  }, []);
+
+
   return <Grid container spacing={2}>
     <Grid container item xs={12}>
       <Grid item xs={12} sm={8}>
@@ -72,6 +74,7 @@ const EmployeesList = () => {
           rowData={employees}
           columnDefs={columnDefs}
           domLayout='autoHeight'
+          onGridReady={onGridReady}
         >
         </AgGridReact>
       </div>

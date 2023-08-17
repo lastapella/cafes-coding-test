@@ -1,6 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
 
-// import { Home } from './pages/home/home';
 import Cafes from './pages/cafes/list';
 import CafeEdit from './pages/cafes/edit';
 import EmployeeEdit from './pages/employees/edit';

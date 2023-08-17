@@ -1,11 +1,12 @@
 import { call, put, all, takeEvery } from 'redux-saga/effects';
-import { Employee, addMultiple, add, update, remove } from './reducer';
+import { Employee, addMultiple, add, update, remove , reset} from './reducer';
 
 
 export function* fetchAllEmployees(): Generator<any, any, any> {
   try {
     const response = yield call(fetch, `${import.meta.env.VITE_API_ENDPOINT}/employees`);
     const data = yield response.json();
+    yield put({ type: reset.type });
     yield put({ type: addMultiple.type, payload: data.data });
   } catch (error) {
     console.log(error);
@@ -16,6 +17,7 @@ export function* fetchEmployeesCafes(action: { payload: string }): Generator<any
     const cafeId = action.payload;
     const response = yield call(fetch, `${import.meta.env.VITE_API_ENDPOINT}/employees?cafe=${cafeId}`);
     const data = yield response.json();
+    yield put({ type: reset.type });
     yield put({ type: addMultiple.type, payload: data.data });
   } catch (error) {
     console.log(error);
@@ -49,6 +51,7 @@ export function* createEmployee(action: { payload: Omit<Employee, 'id'> }): Gene
       },
     });
     const data = yield response.json();
+    console.log(data);
     yield put({ type: add.type, payload: data.data });
   } catch (error) {
     console.log(error);
