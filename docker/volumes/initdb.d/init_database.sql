@@ -18,7 +18,6 @@ CREATE TABLE IF NOT EXISTS cafes_employees (
   cafe_id VARCHAR(36) NOT NULL,
   employee_id VARCHAR(10) NOT NULL,
   joined_at DATETIME NOT NULL,
-  left_at DATETIME,
   PRIMARY KEY (cafe_id, employee_id),
   FOREIGN KEY (cafe_id) REFERENCES cafes(id),
   FOREIGN KEY (employee_id) REFERENCES employees(id)

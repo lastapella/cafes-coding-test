@@ -19,3 +19,9 @@
 - Database
     - Mysql (You can find the database schema declaration in `docker/volumes/initdb.d/init_database.sql`)
 
+## Notes
+- The project has no input validation either for front end or backend
+- Cafe logo is not handled (upload, storage, and image serving)
+- The applications is not fully typesafe
+- Count of days worked in the cafe for an employee is not implemented
+- Location filter is client side only

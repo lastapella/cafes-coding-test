@@ -70,11 +70,13 @@ export const update = async (cafe: Cafe.Full) => {
 
 export const deleteById = async (id: string) => {
   try {
+    await executeQuery(`SET FOREIGN_KEY_CHECKS=0;`, []);
     await executeQuery(`
-      DELETE FROM employees
-      INNER JOIN cafes_employees ON employees.id = cafes_employees.employee_id 
-      WHERE cafes_employees.cafe_id = ?`, [id]);
-    await executeQuery(`DELETE FROM cafes WHERE id = ?`, [id]);
+      DELETE e , c, ce  FROM cafes c
+      INNER JOIN cafes_employees ce ON c.id = ce.cafe_id 
+      INNER JOIN employees e ON ce.employee_id = e.id
+      WHERE ce.cafe_id = ?`, [id]);
+    await executeQuery(`SET FOREIGN_KEY_CHECKS=1;`, []);
   } catch (err) {
     console.log(err)
     throw new Error('Error deleting cafe')

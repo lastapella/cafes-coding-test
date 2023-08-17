@@ -12,9 +12,9 @@ export const getById = async (id: string) => {
   try {
     const query = `
       SELECT e.*, c.name as cafe_name, c.id as cafe_id 
-      FROM employees 
+      FROM employees e
       LEFT JOIN cafes_employees ce ON e.id = ce.employee_id LEFT JOIN cafes c ON ce.cafe_id = c.id
-      WHERE id = ?`;
+      WHERE e.id = ?`;
     const values = [id];
     const result = await executeQuery(query, values);
     return (result as (Employee.Full & { cafe_name: string, cafe_id: string })[])?.[0]
@@ -53,16 +53,21 @@ export const getByCafe = async (cafeId: string) => {
   }
 }
 
-export const create: (employeeData: Omit<Employee.Full, 'id'>) => Promise<Employee.Full> = async (employeeData) => {
+export const create: (employeeData: Omit<Employee.Full, 'id'> & { cafe_id: string }) => Promise<Employee.Full> = async (employeeData) => {
   const id = generateId();
   const exist = await getById(id);
   if (exist) {
     return create(employeeData);
   } else {
-    const query = `INSERT INTO employees (id, name, email_address, phone_number, gender) VALUES (?, ?, ?, ?, ?)`;
-    const values = [id, employeeData.name, employeeData.email_address, employeeData.phone_number, employeeData.gender];
     try {
+      await executeQuery('START TRANSACTION', []);
+      const query = `INSERT INTO employees (id, name, email_address, phone_number, gender) VALUES (?, ?, ?, ?, ?)`;
+      const values = [id, employeeData.name, employeeData.email_address, employeeData.phone_number, employeeData.gender];
       await executeQuery(query, values);
+      const query2 = `INSERT INTO cafes_employees (cafe_id, employee_id, joined_at) VALUES (?, ?, now())`;
+      const values2 = [employeeData.cafe_id, id];
+      await executeQuery(query2, values2);
+      await executeQuery('COMMIT', []);
       const employee = await getById(id);
       return employee as Employee.Full;
     } catch (error) {
